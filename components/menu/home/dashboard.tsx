@@ -1,27 +1,31 @@
-import React from "react";
+import React, { useState } from 'react';
 
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { BookOpen, Coins, Crown } from "lucide-react";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { BookOpen, Coins, Crown } from 'lucide-react';
 
-import { subjects } from "@/constant/dashboard";
-import { Leaderboard } from "@/constant/dashboard";
-import { Question } from "@/constant/dashboard";
+import { subjects } from '@/constant/dashboard';
+import { Leaderboard } from '@/constant/dashboard';
+import { Question } from '@/constant/dashboard';
 
-import useTheme from "@/stores/theme";
-import Link from "next/link";
+import useTheme from '@/stores/theme';
+import { useGetQuestionsList } from '@/hooks/menu/question';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const { setModalQuestion } = useTheme();
+  const [status, setStatus] = useState<'all' | 'answered' | 'unanswered'>('all');
+
+  const { data: questionsData } = useGetQuestionsList({ page: 1, limit: 10, status });
 
   return (
     <div className="grid grid-cols-12 gap-6">
@@ -48,8 +52,8 @@ export default function Dashboard() {
         <Card className="glass-background p-6 rounded-2xl w-full">
           <h2 className="text-4xl font-bold mb-4">Have A Question?</h2>
           <Button
-            variant={"outline"}
-            size={"lg"}
+            variant={'outline'}
+            size={'lg'}
             className="w-fit"
             onClick={() => setModalQuestion(true)}
           >
@@ -57,14 +61,17 @@ export default function Dashboard() {
           </Button>
           <Separator className="my-4" />
           <div className="flex justify-end">
-            <Select>
+            <Select
+              defaultValue="all"
+              onValueChange={(value) => setStatus(value as 'all' | 'answered' | 'unanswered')}
+            >
               <SelectTrigger className="w-[180px] mb-4">
                 <SelectValue placeholder="Select Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system">System</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="answered">Answered</SelectItem>
+                <SelectItem value="unanswered">Unanswered</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -76,12 +83,10 @@ export default function Dashboard() {
                   <div className="flex flex-col sm:flex-row gap-1 sm:items-center">
                     <span className="text-sm font-medium">{q.username}</span>
                     <div className="hidden sm:block w-1 h-1 bg-primary rounded-full" />
-                    <p className="text-xs font-normal text-slate-500">
-                      {q.time}
-                    </p>
+                    <p className="text-xs font-normal text-slate-500">{q.time}</p>
                   </div>
                 </div>
-                <Badge variant={"default"}>
+                <Badge variant={'default'}>
                   <Coins className="w-3 h-3" />+{q.prize}
                   <span className="hidden lg:block">ETH</span>
                 </Badge>
@@ -89,7 +94,11 @@ export default function Dashboard() {
               <p className="text-lg font-normal mt-4 mb-6">{q.question}</p>
               <div className="flex justify-end">
                 <Link href={`/question/${q.id}`}>
-                  <Button size={"lg"} className="max-w-32" variant={"outline"}>
+                  <Button
+                    size={'lg'}
+                    className="max-w-32"
+                    variant={'outline'}
+                  >
                     Answer
                   </Button>
                 </Link>
@@ -108,7 +117,10 @@ export default function Dashboard() {
           <Separator className="my-4" />
           <ul>
             {Leaderboard.map((user, index) => (
-              <li key={index} className="text-sm py-1 px-2">
+              <li
+                key={index}
+                className="text-sm py-1 px-2"
+              >
                 {user.username}
                 <span className="float-right font-medium">
                   {user.tokens}

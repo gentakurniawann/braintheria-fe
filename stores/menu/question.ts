@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { IQuestionStore } from "@/types/menu/question";
+import { create } from 'zustand';
+import { IQuestionStore } from '@/types';
 
 const useQuestion = create<IQuestionStore>((set) => ({
   // state
