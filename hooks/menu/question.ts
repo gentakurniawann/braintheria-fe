@@ -2,14 +2,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getQuestionsList,
   getMyQuestions,
+  getDetailQuestions,
   getAnswerList,
   createQuestion,
-  getDetailQuestions,
+  createAnswer,
 } from '@/services/menu/question';
 import { IQuestionPayload, QuestionListResponse } from '@/types';
 
 export function useGetQuestionsList(params?: {
-  keyword?: string;
+  search?: string;
   page?: number;
   status?: string;
   limit?: number;
@@ -52,5 +53,17 @@ export function useGetAnswerList(questionId?: string, options?: object) {
     queryKey: ['answer-list', questionId],
     queryFn: () => getAnswerList(questionId!),
     ...options,
+  });
+}
+
+export function useCreateAnswer(questionId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { questionId: number; bodyMd: string }) => createAnswer(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['answer-list', questionId],
+      });
+    },
   });
 }

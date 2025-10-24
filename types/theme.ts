@@ -42,7 +42,7 @@ export type TResponseMessage = {
 };
 
 export type TSearchParams = {
-  keyword?: string;
+  search?: string;
   page?: number;
   page_size?: number;
 };
