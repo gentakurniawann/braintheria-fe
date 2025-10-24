@@ -9,6 +9,7 @@ import {
   validateQuestions,
   getLeaderboard,
   updateQuestion,
+  deleteQuestion,
 } from '@/services/menu/question';
 import { IQuestionPayload, QuestionListResponse } from '@/types';
 import { LeaderboardUser } from '@/types/menu/leaderboard';
@@ -55,6 +56,17 @@ export function useCreateQuestion() {
       queryClient.invalidateQueries({
         queryKey: ['questions'],
       });
+    },
+  });
+}
+
+export function useDeleteQuestion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deleteQuestion(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['questions'] });
+      queryClient.invalidateQueries({ queryKey: ['question-detail', id] });
     },
   });
 }

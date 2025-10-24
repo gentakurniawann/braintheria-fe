@@ -59,7 +59,7 @@ export default function QuestionDialog({ questionToEdit }: QuestionDialogProps) 
   });
 
   const { mutate: createQuestion } = useCreateQuestion();
-  const { mutate: updateQuestion } = useUpdateQuestion(questionToEdit?.id.toString() || '');
+  const { mutate: updateQuestion } = useUpdateQuestion(questionToEdit?.id?.toString() || '');
 
   const isEditing = !!questionToEdit;
 

@@ -57,6 +57,16 @@ export async function createQuestion(data: IQuestionPayload): Promise<Response<I
   }
 }
 
+export async function deleteQuestion(id: number): Promise<Response<IQuestion>> {
+  try {
+    const response = await axios.delete(`/questions/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting question with ID ${id}:`, error);
+    throw error;
+  }
+}
+
 export async function updateQuestion(
   data: IQuestionPayload,
   id: string,

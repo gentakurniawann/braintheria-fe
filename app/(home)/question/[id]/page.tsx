@@ -14,6 +14,7 @@ import useQuestion from '@/stores/menu/question';
 import { Leaderboard } from '@/constant/dashboard';
 import { useParams } from 'next/navigation';
 import {
+  useDeleteQuestion,
   useGetAnswerList,
   useGetDetailQuestion,
   useGetLeaderboard,
@@ -50,6 +51,7 @@ export default function Question() {
   const { data: answer } = useGetAnswerList(id!, queryOptions);
   const { mutate: validateAnswer, isPending } = useValidateQuestions(id!);
   const { data: leaderboard, isLoading, error } = useGetLeaderboard();
+  const { mutate: removeQuestion } = useDeleteQuestion();
 
   useEffect(() => {}, [question, answer]);
   return (
@@ -62,7 +64,7 @@ export default function Question() {
               <div className="flex flex-row gap-2 items-center">
                 <div className="w-10 h-10 rounded-full bg-blue-300" />
                 <div className="flex flex-col sm:flex-row gap-1 sm:items-center">
-                  <span className="text-sm font-medium">{question?.author.name}</span>
+                  <span className="text-sm font-medium">{question?.author?.name}</span>
                   <div className="hidden sm:block w-1 h-1 bg-primary rounded-full" />
                   <p className="text-xs font-normal text-slate-500">
                     {question?.createdAt && !isNaN(new Date(question.createdAt).getTime())
@@ -93,14 +95,18 @@ export default function Question() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
                         onClick={() => {
-                          console.log('click baby');
                           setModalQuestion(true);
                         }}
                       >
                         Edit
                       </DropdownMenuItem>
                       <Separator />
-                      <DropdownMenuItem className="!text-red-500">Drop</DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="!text-red-500"
+                        onClick={() => removeQuestion(question.id)}
+                      >
+                        Drop
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}
@@ -132,7 +138,7 @@ export default function Question() {
                 />
                 <div className="text-center">
                   <h3 className="text-2xl font-medium max-w-72">
-                    {question?.author.name} is waiting for your help.
+                    {question?.author?.name} is waiting for your help.
                   </h3>
                   <span className="text-base text-slate-500">Give answers and earn coins.</span>
                 </div>
