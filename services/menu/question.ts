@@ -46,6 +46,19 @@ export async function createQuestion(data: IQuestionPayload): Promise<Response<I
   }
 }
 
+export async function validateQuestions(
+  questionId: string,
+  answerId: string,
+): Promise<Response<IQuestion>> {
+  try {
+    const response = await axios.patch(`/questions/${questionId}/approve-answer/${answerId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating question:', error);
+    throw error;
+  }
+}
+
 export async function getAnswerList(questionId: string): Promise<IAnswer> {
   try {
     const response = await axios.get(`/answers/${questionId}`);

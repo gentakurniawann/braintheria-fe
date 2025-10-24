@@ -75,9 +75,9 @@ const useAuth = create<IAuthStore>((set, get) => ({
     }
   },
 
-  integrateWallet: async (walletId: string) => {
+  integrateWallet: async (address: string) => {
     try {
-      const response = await integrateWallet(walletId);
+      const response = await integrateWallet(address);
       return response;
     } catch (error) {
       console.error('Error store integrateWallet:', error);

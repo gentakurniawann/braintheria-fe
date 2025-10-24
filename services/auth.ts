@@ -21,9 +21,9 @@ export async function getMe(): Promise<TResponseMe> {
   }
 }
 
-export async function integrateWallet(walletId: string): Promise<TWalletResponse> {
+export async function integrateWallet(address: string): Promise<TWalletResponse> {
   try {
-    const response = await axios.patch('/auth/me/wallet', { walletId });
+    const response = await axios.patch('/auth/me/wallet', { address });
     return response.data;
   } catch (error) {
     console.error('Error from integrateWallet: ', error);

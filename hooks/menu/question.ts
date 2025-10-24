@@ -6,6 +6,7 @@ import {
   getAnswerList,
   createQuestion,
   createAnswer,
+  validateQuestions,
 } from '@/services/menu/question';
 import { IQuestionPayload, QuestionListResponse } from '@/types';
 
@@ -56,11 +57,32 @@ export function useGetAnswerList(questionId?: string, options?: object) {
   });
 }
 
-export function useCreateAnswer(questionId: number) {
+// Make questionId type consistent (use string throughout)
+export function useCreateAnswer(questionId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: { questionId: number; bodyMd: string }) => createAnswer(data),
     onSuccess: () => {
+      // Invalidate with string type to match your queries
+      queryClient.invalidateQueries({
+        queryKey: ['answer-list', questionId],
+      });
+      // Also invalidate question detail to update answer count, etc.
+      queryClient.invalidateQueries({
+        queryKey: ['question-detail', questionId],
+      });
+    },
+  });
+}
+
+export function useValidateQuestions(questionId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (answerId: string) => validateQuestions(questionId, answerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['question-detail', questionId],
+      });
       queryClient.invalidateQueries({
         queryKey: ['answer-list', questionId],
       });

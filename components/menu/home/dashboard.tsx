@@ -116,7 +116,7 @@ export default function Dashboard() {
                     className="max-w-32"
                     variant={'outline'}
                   >
-                    Answer
+                    {q.isAuthor ? 'Detail' : 'Answer'}
                   </Button>
                 </Link>
               </div>

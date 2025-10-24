@@ -36,7 +36,7 @@ export default function AnswerDialog({ question, questionId }: IAnswerDialogProp
     },
   });
 
-  const { mutate: createAnswer } = useCreateAnswer(questionId);
+  const { mutate: createAnswer } = useCreateAnswer(questionId.toString());
 
   const onSubmit = async (data: z.infer<ReturnType<typeof answerFormSchema>>) => {
     createAnswer({ questionId, bodyMd: data?.bodyMd });

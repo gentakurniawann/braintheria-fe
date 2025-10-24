@@ -7,7 +7,7 @@ export interface IAuthStore {
   getUserCredential: () => Promise<TResponseMe | null>;
   setUserCredential: (user: TResponseMe) => void;
   logout: () => void;
-  integrateWallet: (walletId: string) => Promise<TWalletResponse>;
+  integrateWallet: (address: string) => Promise<TWalletResponse>;
 }
 export interface IAuthPersistStore {
   checkMe: () => Promise<TResponseMe>;

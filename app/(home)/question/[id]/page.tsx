@@ -13,7 +13,11 @@ import AnswerDialog from '@/components/global/dialog/answer';
 import useQuestion from '@/stores/menu/question';
 import { Leaderboard } from '@/constant/dashboard';
 import { useParams } from 'next/navigation';
-import { useGetAnswerList, useGetDetailQuestion } from '@/hooks/menu/question';
+import {
+  useGetAnswerList,
+  useGetDetailQuestion,
+  useValidateQuestions,
+} from '@/hooks/menu/question';
 
 export default function Question() {
   const { setModalAnswer } = useQuestion();
@@ -32,9 +36,9 @@ export default function Question() {
 
   const { data: question } = useGetDetailQuestion(id!, queryOptions);
   const { data: answer } = useGetAnswerList(id!, queryOptions);
+  const { mutate: validateAnswer, isPending } = useValidateQuestions(id!);
 
-  useEffect(() => {
-  }, [question, answer]);
+  useEffect(() => {}, [question, answer]);
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-7 lg:col-start-2">
@@ -70,42 +74,48 @@ export default function Question() {
             </div>
             <h4 className="font-semibold mt-4">{question?.title}</h4>
             <p className="text-lg font-normal mt-1.5 mb-6">{question?.bodyMd}</p>
-            <Button
-              size={'lg'}
-              className="max-w-40"
-              variant={'outline'}
-              onClick={() => setModalAnswer(true)}
-            >
-              <Plus />
-              Add an Answer
-            </Button>
-          </Card>
-          {/* Answer Section */}
-          <Card className="glass-background p-6 rounded-2xl w-full">
-            <div className="flex justify-center gap-4 items-center flex-col">
-              <Image
-                src={'/images/waiting-image.png'}
-                alt="waiting-image"
-                width={360}
-                height={237}
-              />
-              <div className="text-center">
-                <h3 className="text-2xl font-medium max-w-72">
-                  {question?.author.name} is waiting for your help.
-                </h3>
-                <span className="text-base text-slate-500">Give answers and earn coins.</span>
-              </div>
+            {!question?.isAuthor && question?.status === 'Open' && (
               <Button
-                size={'lg'}
-                className="max-w-72 w-full"
-                variant={'outline'}
+                size="lg"
+                className="max-w-40"
+                variant="outline"
                 onClick={() => setModalAnswer(true)}
               >
                 <Plus />
                 Add an Answer
               </Button>
-            </div>
+            )}
           </Card>
+          {/* Answer Section */}
+          {!question?.isAuthor && question?.status === 'Open' && answer?.answers?.length === 0 && (
+            <Card className="glass-background p-6 rounded-2xl w-full">
+              <div className="flex justify-center gap-4 items-center flex-col">
+                <Image
+                  src={'/images/waiting-image.png'}
+                  alt="waiting-image"
+                  width={360}
+                  height={237}
+                />
+                <div className="text-center">
+                  <h3 className="text-2xl font-medium max-w-72">
+                    {question?.author.name} is waiting for your help.
+                  </h3>
+                  <span className="text-base text-slate-500">Give answers and earn coins.</span>
+                </div>
+                {!question?.isAuthor && question?.status === 'Open' && (
+                  <Button
+                    size="lg"
+                    className="max-w-72 w-full"
+                    variant="outline"
+                    onClick={() => setModalAnswer(true)}
+                  >
+                    <Plus />
+                    Add an Answer
+                  </Button>
+                )}
+              </div>
+            </Card>
+          )}
           {answer?.answers?.map((answer, index) => (
             <Card
               className="glass-background p-6 rounded-2xl w-full"
@@ -113,18 +123,22 @@ export default function Question() {
             >
               <div className="flex flex-row justify-between items-center">
                 <h4 className="text-lg font-bold">Answer</h4>
-                <Button
-                  size={'sm'}
-                  variant={'outline'}
-                >
-                  Validate
-                </Button>
+                {question?.isAuthor && question?.status === 'Open' && (
+                  <Button
+                    size={'sm'}
+                    variant={'outline'}
+                    onClick={() => validateAnswer(answer.id.toString())}
+                    disabled={isPending}
+                  >
+                    {isPending ? 'Validating...' : 'Validate'}
+                  </Button>
+                )}
               </div>
               <Separator className="my-4" />
               <div className="flex flex-row gap-2 items-center mb-4">
                 <div className="w-10 h-10 rounded-full bg-blue-300" />
                 <div>
-                  <span className="text-sm font-medium">{answer.author.email}</span>
+                  <span className="text-sm font-medium">{answer.author.name}</span>
                   <p className="text-xs font-normal text-slate-500">
                     {' '}
                     {answer?.createdAt && !isNaN(new Date(answer.createdAt).getTime())

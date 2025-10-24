@@ -18,6 +18,7 @@ type Author = {
 export interface IQuestion {
   id: number;
   author: Author;
+  isAuthor: boolean;
   authorId: number;
   title: string;
   bodyMd: string;
@@ -57,6 +58,6 @@ export interface IAnswer {
 
 export interface Iauthor {
   id: number;
-  email: string;
+  name: string;
   primaryWallet: string;
 }
