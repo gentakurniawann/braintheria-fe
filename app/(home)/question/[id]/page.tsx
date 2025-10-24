@@ -49,6 +49,7 @@ export default function Question() {
   const { data: question } = useGetDetailQuestion(id!, queryOptions);
   const { data: answer } = useGetAnswerList(id!, queryOptions);
   const { mutate: validateAnswer, isPending } = useValidateQuestions(id!);
+  const { mutate: removeQuestion } = useDeleteQuestion(id!);
 
   const handleValidate = (answerId: string) => {
     validateAnswer(answerId, {
@@ -62,8 +63,6 @@ export default function Question() {
       },
     });
   };
-  const { mutate: removeQuestion } = useDeleteQuestion();
-
   useEffect(() => {}, [question, answer]);
   return (
     <div className="grid grid-cols-12 gap-6">
