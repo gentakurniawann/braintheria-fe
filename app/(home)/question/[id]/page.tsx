@@ -104,8 +104,11 @@ export default function Question() {
               </Button>
             </div>
           </Card>
-          {(answer?.data || []).map((a) => (
-            <Card className="glass-background p-6 rounded-2xl w-full">
+          {answer?.data?.answers?.map((answer, index) => (
+            <Card
+              className="glass-background p-6 rounded-2xl w-full"
+              key={index}
+            >
               <div className="flex flex-row justify-between items-center">
                 <h4 className="text-lg font-bold">Answer</h4>
                 <Button
@@ -122,8 +125,8 @@ export default function Question() {
                   <span className="text-sm font-medium">{}</span>
                   <p className="text-xs font-normal text-slate-500">
                     {' '}
-                    {question?.createdAt && !isNaN(new Date(question.createdAt).getTime())
-                      ? new Date(question.createdAt).toLocaleString('en-GB', {
+                    {answer?.createdAt && !isNaN(new Date(answer.createdAt).getTime())
+                      ? new Date(answer.createdAt).toLocaleString('en-GB', {
                           day: '2-digit',
                           month: 'short',
                           year: 'numeric',
@@ -134,103 +137,9 @@ export default function Question() {
                   </p>
                 </div>
               </div>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                deserunt mollit anim id est laborum.
-              </p>
+              <p className="text-lg font-normal">{answer?.bodyMd}</p>
             </Card>
           ))}
-          {/* Other Questions to Answer
-          <Card className="glass-background p-6 rounded-2xl w-full">
-            <h4 className="text-lg font-bold mb-4">Answer other questions</h4>
-            <div className="space-y-4">
-              <div>
-                <div className="flex flex-row justify-between items-center">
-                  <div className="flex flex-row gap-2 items-center">
-                    <div className="w-10 h-10 rounded-full bg-blue-300" />
-                    <div className="flex flex-col sm:flex-row gap-1 sm:items-center">
-                      <span className="text-sm font-medium">{question?.author.name}</span>
-                      <div className="hidden sm:block w-1 h-1 bg-primary rounded-full" />
-                      <p className="text-xs font-normal text-slate-500">
-                        {' '}
-                        {question?.createdAt && !isNaN(new Date(question.createdAt).getTime())
-                          ? new Date(question.createdAt).toLocaleString('en-GB', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
-                          : '—'}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge variant={'default'}>
-                    <Coins className="w-3 h-3" />
-                    +0.01
-                    <span className="hidden lg:block">ETH</span>
-                  </Badge>
-                </div>
-                <p className="text-lg font-normal mt-4 mb-6">{question?.bodyMd}</p>
-                <div className="flex justify-end mb-4">
-                  <Button
-                    size={'lg'}
-                    className="max-w-32"
-                    variant={'outline'}
-                  >
-                    Answer
-                  </Button>
-                </div>
-                <Separator />
-              </div>
-              <div>
-                <div className="flex flex-row justify-between items-center">
-                  <div className="flex flex-row gap-2 items-center">
-                    <div className="w-10 h-10 rounded-full bg-blue-300" />
-                    <div className="flex flex-col sm:flex-row gap-1 sm:items-center">
-                      <span className="text-sm font-medium">{question?.author.name}</span>
-                      <div className="hidden sm:block w-1 h-1 bg-primary rounded-full" />
-                      <p className="text-xs font-normal text-slate-500">
-                        {' '}
-                        {question?.createdAt && !isNaN(new Date(question.createdAt).getTime())
-                          ? new Date(question.createdAt).toLocaleString('en-GB', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
-                          : '—'}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge variant={'default'}>
-                    <Coins className="w-3 h-3" />
-                    +0.01
-                    <span className="hidden lg:block">ETH</span>
-                  </Badge>
-                </div>
-                <p className="text-lg font-normal mt-4 mb-6">
-                  The line g:2x+4y-3=0 is dilated with a scale factor of -2 towards the center point
-                  (2, -4). The equation of the line g after dilation is...
-                </p>
-                <div className="flex justify-end mb-4">
-                  <Button
-                    size={'lg'}
-                    className="max-w-32"
-                    variant={'outline'}
-                  >
-                    Answer
-                  </Button>
-                </div>
-                <Separator />
-              </div>
-            </div>
-          </Card> */}
         </div>
       </div>
       <div className="col-span-12 lg:col-span-3">
@@ -256,7 +165,10 @@ export default function Question() {
           </ul>
         </Card>
       </div>
-      <AnswerDialog />
+      <AnswerDialog
+        question={question?.bodyMd || ''}
+        questionId={Number(question?.id)}
+      />
     </div>
   );
 }
