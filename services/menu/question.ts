@@ -57,6 +57,19 @@ export async function createQuestion(data: IQuestionPayload): Promise<Response<I
   }
 }
 
+export async function updateQuestion(
+  data: IQuestionPayload,
+  id: string,
+): Promise<Response<IQuestion>> {
+  try {
+    const response = await axios.patch(`/questions/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating question:', error);
+    throw error;
+  }
+}
+
 export async function validateQuestions(
   questionId: string,
   answerId: string,

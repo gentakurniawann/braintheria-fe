@@ -1,17 +1,17 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
-import { IThemeStore } from "@/types";
+import { IThemeStore } from '@/types';
 
 const useTheme = create<IThemeStore>((set) => ({
   // state
   isLoading: false,
   modalSuccess: {
     open: false,
-    title: "",
-    message: "",
-    actionMessage: "Ok, Back",
-    actionVariant: "outline",
-    animation: "success",
+    title: '',
+    message: '',
+    actionMessage: 'Ok, Back',
+    actionVariant: 'outline',
+    animation: 'success',
   },
   modalQuestion: false,
 
@@ -19,15 +19,7 @@ const useTheme = create<IThemeStore>((set) => ({
   setLoading: (loading) => {
     set({ isLoading: loading });
   },
-  setModalSuccess: ({
-    open,
-    title,
-    message,
-    action,
-    actionMessage,
-    actionVariant,
-    animation,
-  }) =>
+  setModalSuccess: ({ open, title, message, action, actionMessage, actionVariant, animation }) =>
     set({
       modalSuccess: {
         open,

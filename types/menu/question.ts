@@ -37,6 +37,7 @@ export interface IQuestionPayload {
   bodyMd: string;
   bounty: string;
   token: string;
+  id?: string;
 }
 
 export interface IAnswer {

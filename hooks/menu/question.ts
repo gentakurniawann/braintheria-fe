@@ -8,6 +8,7 @@ import {
   createAnswer,
   validateQuestions,
   getLeaderboard,
+  updateQuestion,
 } from '@/services/menu/question';
 import { IQuestionPayload, QuestionListResponse } from '@/types';
 import { LeaderboardUser } from '@/types/menu/leaderboard';
@@ -54,6 +55,19 @@ export function useCreateQuestion() {
       queryClient.invalidateQueries({
         queryKey: ['questions'],
       });
+    },
+  });
+}
+
+export function useUpdateQuestion(id: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: IQuestionPayload) => updateQuestion(data, id),
+    onSuccess: () => {
+      // Refresh question list & detail after update
+      queryClient.invalidateQueries({ queryKey: ['questions'] });
+      queryClient.invalidateQueries({ queryKey: ['question-detail', id] });
     },
   });
 }

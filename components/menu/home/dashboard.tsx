@@ -19,6 +19,7 @@ import { Leaderboard } from '@/constant/dashboard';
 import useTheme from '@/stores/theme';
 import { useGetLeaderboard, useGetQuestionsList } from '@/hooks/menu/question';
 import Link from 'next/link';
+import QuestionDialog from '@/components/global/dialog/question';
 
 export default function Dashboard() {
   const { setModalQuestion } = useTheme();

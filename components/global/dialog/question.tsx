@@ -14,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import useTheme from '@/stores/theme';
 import { CustomField } from '@/components/ui/form-field';
 import { Text as TextInput } from '@/components/ui/text';
-import { useCreateQuestion } from '@/hooks/menu/question';
+import { useCreateQuestion, useUpdateQuestion } from '@/hooks/menu/question';
 import { IQuestionPayload } from '@/types/menu/question';
 
 export const makeQuestionFormSchema = (userBalance: number) =>
@@ -32,32 +32,64 @@ export const makeQuestionFormSchema = (userBalance: number) =>
       }),
   });
 
-export default function QuestionDialog() {
+interface QuestionDialogProps {
+  questionToEdit?: {
+    id: number;
+    title: string;
+    bodyMd: string;
+    bountyAmountWei?: string;
+  } | null;
+}
+
+export default function QuestionDialog({ questionToEdit }: QuestionDialogProps) {
   const { modalQuestion, setModalQuestion } = useTheme();
   const { address } = useAccount();
-  const { data: userBalance } = useBalance({
-    address: address,
-  });
+  const { data: userBalance } = useBalance({ address });
 
-  const questionFormSchema = makeQuestionFormSchema(Number(userBalance?.decimals) || 0);
+  const balanceValue = parseFloat(userBalance?.formatted || '0');
+  const questionFormSchema = makeQuestionFormSchema(balanceValue);
+
   const form = useForm<z.infer<typeof questionFormSchema>>({
     resolver: zodResolver(questionFormSchema),
     defaultValues: {
-      title: '',
-      bodyMd: '',
-      bounty: '',
+      title: questionToEdit?.title || '',
+      bodyMd: questionToEdit?.bodyMd || '',
+      bounty: questionToEdit ? (Number(questionToEdit.bountyAmountWei) / 1e18).toString() : '',
     },
   });
 
   const { mutate: createQuestion } = useCreateQuestion();
+  const { mutate: updateQuestion } = useUpdateQuestion(questionToEdit?.id.toString() || '');
+
+  const isEditing = !!questionToEdit;
 
   const onSubmit = async (data: z.infer<typeof questionFormSchema>) => {
-    await createQuestion(data as IQuestionPayload);
+    const payload: IQuestionPayload = {
+      title: data.title,
+      bodyMd: data.bodyMd,
+      bounty: data.bounty,
+      token: 'ETH',
+    };
+
+    if (isEditing && questionToEdit) {
+      await updateQuestion({ id: questionToEdit.id.toString(), ...payload });
+    } else {
+      await createQuestion(payload);
+    }
+
     setModalQuestion(false);
     form.reset();
   };
 
-  useEffect(() => {}, [modalQuestion]);
+  useEffect(() => {
+    if (questionToEdit) {
+      form.reset({
+        title: questionToEdit.title,
+        bodyMd: questionToEdit.bodyMd,
+        bounty: (Number(questionToEdit.bountyAmountWei) / 1e18).toString(),
+      });
+    }
+  }, [questionToEdit, form]);
 
   return (
     <Dialog
@@ -66,8 +98,9 @@ export default function QuestionDialog() {
     >
       <DialogContent className="!max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Ask a Question</DialogTitle>
+          <DialogTitle>{isEditing ? 'Edit Question' : 'Ask a Question'}</DialogTitle>
         </DialogHeader>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="space-y-4">
@@ -94,7 +127,7 @@ export default function QuestionDialog() {
               <div className="flex flex-row justify-between items-center">
                 <div className="flex flex-row gap-2 items-center">
                   <CustomField
-                    name={'bounty'}
+                    name="bounty"
                     control={form.control}
                     render={({ field }) => (
                       <TextInput
@@ -106,18 +139,17 @@ export default function QuestionDialog() {
                   <div>
                     <Coins className="inline-block mr-1 w-6 h-6 text-primary" />
                     <span className="text-xs text-primary font-normal">
-                      you have{' '}
-                      {userBalance?.formatted ? parseFloat(userBalance.formatted).toFixed(4) : 0} coins
-                      now
+                      you have {balanceValue.toFixed(4)} coins now
                     </span>
                   </div>
                 </div>
+
                 <Button
                   type="submit"
                   variant="default"
                   size={'lg'}
                 >
-                  Submit Question
+                  {isEditing ? 'Save Changes' : 'Submit Question'}
                 </Button>
               </div>
             </div>

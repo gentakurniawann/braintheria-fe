@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Coins, Crown, Plus } from 'lucide-react';
+import { Coins, Crown, EllipsisVertical, Pencil, Plus, UserCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
@@ -19,9 +19,20 @@ import {
   useGetLeaderboard,
   useValidateQuestions,
 } from '@/hooks/menu/question';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+import useTheme from '@/stores/theme';
+import QuestionDialog from '@/components/global/dialog/question';
 
 export default function Question() {
   const { setModalAnswer } = useQuestion();
+  const { setModalQuestion } = useTheme();
+
   const { id } = useParams<{ id?: string }>();
   const isValidId = !!id && typeof id === 'string';
 
@@ -66,13 +77,34 @@ export default function Question() {
                   </p>
                 </div>
               </div>
-              <Badge variant={'default'}>
-                <Coins className="w-3 h-3" />
-                {question?.bountyAmountWei && !isNaN(Number(question.bountyAmountWei))
-                  ? (Number(question.bountyAmountWei) / 1e18).toFixed(4)
-                  : '0.0000'}{' '}
-                <span className="hidden lg:block">ETH</span>
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant={'default'}>
+                  <Coins className="w-3 h-3" />
+                  {question?.bountyAmountWei && !isNaN(Number(question.bountyAmountWei))
+                    ? (Number(question.bountyAmountWei) / 1e18).toFixed(4)
+                    : '0.0000'}{' '}
+                  <span className="hidden lg:block">ETH</span>
+                </Badge>
+                {question?.isAuthor && question?.status === 'Open' && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <EllipsisVertical className="w-5 h-5 text-blue-950 cursor-pointer" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          console.log('click baby');
+                          setModalQuestion(true);
+                        }}
+                      >
+                        Edit
+                      </DropdownMenuItem>
+                      <Separator />
+                      <DropdownMenuItem className="!text-red-500">Drop</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
             </div>
             <h4 className="font-semibold mt-4">{question?.title}</h4>
             <p className="text-lg font-normal mt-1.5 mb-6">{question?.bodyMd}</p>
@@ -187,6 +219,7 @@ export default function Question() {
         question={question?.bodyMd || ''}
         questionId={Number(question?.id)}
       />
+      <QuestionDialog questionToEdit={question} />
     </div>
   );
 }
