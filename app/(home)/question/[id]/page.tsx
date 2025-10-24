@@ -34,7 +34,6 @@ export default function Question() {
   const { data: answer } = useGetAnswerList(id!, queryOptions);
 
   useEffect(() => {
-    console.log(answer);
   }, [question, answer]);
   return (
     <div className="grid grid-cols-12 gap-6">
