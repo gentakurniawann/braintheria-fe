@@ -16,6 +16,7 @@ import { useParams } from 'next/navigation';
 import {
   useGetAnswerList,
   useGetDetailQuestion,
+  useGetLeaderboard,
   useValidateQuestions,
 } from '@/hooks/menu/question';
 
@@ -37,6 +38,7 @@ export default function Question() {
   const { data: question } = useGetDetailQuestion(id!, queryOptions);
   const { data: answer } = useGetAnswerList(id!, queryOptions);
   const { mutate: validateAnswer, isPending } = useValidateQuestions(id!);
+  const { data: leaderboard, isLoading, error } = useGetLeaderboard();
 
   useEffect(() => {}, [question, answer]);
   return (
@@ -166,14 +168,14 @@ export default function Question() {
           </div>
           <Separator className="my-4" />
           <ul>
-            {Leaderboard.map((user, index) => (
+            {leaderboard?.map((user, idx) => (
               <li
-                key={index}
+                key={idx}
                 className="text-sm py-1 px-2"
               >
-                {user.username}
+                {user?.name}
                 <span className="float-right font-medium">
-                  {user.tokens}
+                  {user?._count?.answers}
                   <Coins className="inline-block w-3 h-3 ml-2" />
                 </span>
               </li>

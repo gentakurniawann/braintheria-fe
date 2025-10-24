@@ -7,8 +7,10 @@ import {
   createQuestion,
   createAnswer,
   validateQuestions,
+  getLeaderboard,
 } from '@/services/menu/question';
 import { IQuestionPayload, QuestionListResponse } from '@/types';
+import { LeaderboardUser } from '@/types/menu/leaderboard';
 
 export function useGetQuestionsList(params?: {
   search?: string;
@@ -26,6 +28,13 @@ export function useGetMyQuestions() {
   return useQuery({
     queryKey: ['my-questions'],
     queryFn: () => getMyQuestions(),
+  });
+}
+
+export function useGetLeaderboard() {
+  return useQuery<LeaderboardUser[]>({
+    queryKey: ['leaderboard'],
+    queryFn: getLeaderboard,
   });
 }
 

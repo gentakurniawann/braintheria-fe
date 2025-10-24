@@ -11,13 +11,13 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Coins, Crown } from 'lucide-react';
+import { BadgeCheck, BookOpen, Coins, Crown } from 'lucide-react';
 
 import { subjects } from '@/constant/dashboard';
 import { Leaderboard } from '@/constant/dashboard';
 
 import useTheme from '@/stores/theme';
-import { useGetQuestionsList } from '@/hooks/menu/question';
+import { useGetLeaderboard, useGetQuestionsList } from '@/hooks/menu/question';
 import Link from 'next/link';
 
 export default function Dashboard() {
@@ -25,28 +25,10 @@ export default function Dashboard() {
   const [status, setStatus] = useState<'All' | 'Open' | 'Verified' | 'Cancelled'>('All');
 
   const { data: questions } = useGetQuestionsList({ page: 1, limit: 10, status });
+  const { data: leaderboard, isLoading, error } = useGetLeaderboard();
 
   return (
     <div className="grid grid-cols-12 gap-6">
-      <div className="hidden lg:block lg:col-span-2">
-        <Card className="glass-background p-6 rounded-2xl w-full">
-          <div className="flex gap-2 items-center">
-            <BookOpen className="h-6 w-6" />
-            <h4 className="text-lg font-bold">Subject</h4>
-          </div>
-          <Separator className="my-4" />
-          <ul>
-            {subjects.map((subject) => (
-              <li
-                key={subject.id}
-                className="text-sm py-1 px-2 cursor-pointer hover:bg-primary hover:text-white rounded-md"
-              >
-                {subject.name}
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </div>
       <div className="col-span-12 lg:col-span-7">
         <Card className="glass-background p-6 rounded-2xl w-full">
           <h2 className="text-4xl font-bold mb-4">Have A Question?</h2>
@@ -129,19 +111,22 @@ export default function Dashboard() {
         <Card className="glass-background p-6 rounded-2xl w-full">
           <div className="flex gap-2 items-center">
             <Crown className="h-6 w-6" />
-            <h4 className="text-lg font-bold">Leaderboard</h4>
+            <h4 className="text-lg font-bold">Verified Leaderboard</h4>
           </div>
           <Separator className="my-4" />
           <ul>
-            {Leaderboard.map((user, index) => (
+            {leaderboard?.map((user, index) => (
               <li
                 key={index}
-                className="text-sm py-1 px-2"
+                className="text-sm py-1 px-2 flex flex-row justify-between items-center"
               >
-                {user.username}
-                <span className="float-right font-medium">
-                  {user.tokens}
-                  <Coins className="inline-block w-3 h-3 ml-2" />
+                {user?.name}
+                <span className="float-right font-medium text-xs">
+                  {user?._count?.answers}{' '}
+                  {user?._count?.answers === 1 || user?._count?.answers === 0
+                    ? 'Answer'
+                    : 'Answers'}
+                  <BadgeCheck className="inline-block w-4 h-4 ml-2" />
                 </span>
               </li>
             ))}

@@ -1,5 +1,6 @@
 import axios from '@/lib/axios';
 import { IAnswer, IQuestion, IQuestionPayload, QuestionListResponse, Response } from '@/types';
+import { LeaderboardUser } from '@/types/menu/leaderboard';
 
 export async function getQuestionsList(params?: {
   search?: string;
@@ -32,6 +33,16 @@ export async function getMyQuestions(): Promise<Response<IQuestion[]>> {
     return response.data;
   } catch (error) {
     console.error('Error fetching my questions:', error);
+    throw error;
+  }
+}
+
+export async function getLeaderboard(): Promise<LeaderboardUser[]> {
+  try {
+    const response = await axios.get<LeaderboardUser[]>('/leaderboard');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
     throw error;
   }
 }
