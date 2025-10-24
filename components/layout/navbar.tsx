@@ -85,7 +85,7 @@ export default function Navbar() {
             <DropdownMenuItem>Wallet</DropdownMenuItem>
             <Separator className="my-1" />
             <DropdownMenuItem
-              onClick={logout}
+              onClick={() => logout()}
               className="!text-red-500"
             >
               Logout
