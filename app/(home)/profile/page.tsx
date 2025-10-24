@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useAccount } from 'wagmi';
+import { parseAsInteger, useQueryStates } from 'nuqs';
 
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -12,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Coins } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { PaginationCompo } from '@/components/ui/pagination';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export default function Profile() {
@@ -19,7 +21,20 @@ export default function Profile() {
   const { address, isConnected } = useAccount();
   const integratedWalletRef = useRef<string | null>(null);
 
-  const { data: myQuestions } = useGetMyQuestions();
+  const [get, set] = useQueryStates({
+    page: parseAsInteger.withDefault(1),
+    limit: parseAsInteger.withDefault(10),
+  });
+
+  const { data: myQuestions } = useGetMyQuestions({
+    page: get.page,
+    page_size: get.limit,
+  });
+
+  const handlePageChange = ({ page, limit }: { page: number; limit: number }) => {
+    set({ page });
+    set({ limit });
+  };
 
   useEffect(() => {
     getUserCredential();
@@ -146,6 +161,19 @@ export default function Profile() {
               <Separator className="my-4" />
             </div>
           ))}
+          <PaginationCompo
+            meta={{
+              pagination: {
+                page: myQuestions?.meta?.page || 1,
+                limit: myQuestions?.meta?.limit || 10,
+                totalPages: myQuestions?.meta?.totalPages || 0,
+                total: myQuestions?.meta?.total || 0,
+                filter: myQuestions?.meta?.filter || '',
+                search: myQuestions?.meta?.search || '',
+              },
+            }}
+            onPageChange={handlePageChange}
+          />
         </Card>
       </div>
     </div>

@@ -80,7 +80,7 @@ export default function SignIn() {
             width={155}
             height={24}
           />
-          <h2 className="text-2xl font-bold text-blue-800 dark:text-sky-100">Welcome Back 👋</h2>
+          <h2 className="text-2xl font-bold text-blue-950">Sign In</h2>
           <p className="text-slate-500 text-sm mt-1">Sign in with your Google account</p>
         </div>
 

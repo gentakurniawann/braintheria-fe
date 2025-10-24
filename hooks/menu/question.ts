@@ -26,10 +26,15 @@ export function useGetQuestionsList(params?: {
   });
 }
 
-export function useGetMyQuestions() {
+export function useGetMyQuestions(params?: {
+  search?: string;
+  status?: string;
+  page?: number;
+  page_size?: number;
+}) {
   return useQuery({
-    queryKey: ['my-questions'],
-    queryFn: () => getMyQuestions(),
+    queryKey: ['my-questions', params],
+    queryFn: () => getMyQuestions(params),
   });
 }
 

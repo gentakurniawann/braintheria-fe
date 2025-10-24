@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 
@@ -41,8 +41,6 @@ export default function Dashboard() {
     set({ page });
     set({ limit });
   };
-
-  useEffect(() => {}, [questions, status]);
 
   return (
     <div className="grid grid-cols-12 gap-6">

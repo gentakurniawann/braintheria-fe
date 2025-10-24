@@ -2,6 +2,7 @@ import { ApiResponse } from '../global/api';
 
 export type QuestionListResponse = ApiResponse<IQuestion[]>;
 export type QuestionDetailResponse = ApiResponse<IQuestion>;
+export type MyQuestionsResponse = ApiResponse<IQuestion[]>;
 
 export interface IQuestionStore {
   modalAnswer: boolean;
