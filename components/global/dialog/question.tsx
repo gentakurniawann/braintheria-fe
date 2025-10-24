@@ -7,7 +7,7 @@ import useAuth from '@/stores/auth';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
-import { Coins, Text } from 'lucide-react';
+import { Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -18,11 +18,9 @@ export const makeQuestionFormSchema = (userBalance: number) =>
     bounty: z
       .string()
       .nonempty('Please insert bounty')
-      // Step 1: must be a valid number or decimal
       .refine((val) => /^[0-9]*\.?[0-9]+$/.test(val), {
         message: 'Bounty must be a valid number',
       })
-      // Step 2: must not exceed wallet balance
       .refine((val) => parseFloat(val) <= userBalance, {
         message: `Bounty cannot exceed your wallet balance (${userBalance} ETH)`,
       }),
@@ -31,7 +29,6 @@ export const makeQuestionFormSchema = (userBalance: number) =>
 import useTheme from '@/stores/theme';
 import { CustomField } from '@/components/ui/form-field';
 import { Text as TextInput } from '@/components/ui/text';
-// import { createQuestion, getQuestionsList } from '@/services/menu/question';
 import { useCreateQuestion } from '@/hooks/menu/question';
 import { IQuestionPayload } from '@/types/menu/question';
 

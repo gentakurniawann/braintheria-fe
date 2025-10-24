@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -21,6 +20,7 @@ export default function SignIn() {
     if (token) {
       handleTokenCallback(token);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   const handleTokenCallback = async (token: string) => {
@@ -29,7 +29,7 @@ export default function SignIn() {
 
     try {
       // store token in zustand and cookies
-      await setToken(token);
+      setToken(token);
       // fetch user data
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/me`, {
         method: 'GET',
@@ -43,7 +43,7 @@ export default function SignIn() {
         throw new Error('Failed to fetch user data');
       }
       const userData = await response.json();
-      await setUserCredential(userData);
+      setUserCredential(userData);
 
       // redirect
       router.push('/');

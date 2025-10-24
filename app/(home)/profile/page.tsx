@@ -19,6 +19,7 @@ export default function Profile() {
 
   useEffect(() => {
     getUserCredential();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
