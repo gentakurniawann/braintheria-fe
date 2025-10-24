@@ -1,15 +1,15 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-import { login, logout, getMe } from "@/services/auth";
-import { getCookies, setCookies, deleteCookie } from "@/utils/cookie";
-import { IAuthStore, IAuthPersistStore, TResponseMe } from "@/types/auth";
+import { logout, getMe } from '@/services/auth';
+import { getCookies, setCookies, deleteCookie } from '@/utils/cookie';
+import { IAuthStore, IAuthPersistStore, TResponseMe } from '@/types/auth';
 
 const useAuth = create<IAuthStore>((set, get) => ({
   // state
-  token: "a",
-  wsToken: "",
-  tempUser: "",
+  token: '',
+  wsToken: '',
+  tempUser: '',
 
   // actions
   getToken: async () => {
@@ -18,28 +18,50 @@ const useAuth = create<IAuthStore>((set, get) => ({
     }
 
     try {
-      const tokenCookie = await getCookies("token");
+      const tokenCookie = await getCookies('token');
       if (tokenCookie?.value) {
-        setCookies("token", tokenCookie.value);
+        setCookies('token', tokenCookie.value);
         set({ token: tokenCookie.value });
         return tokenCookie.value;
       }
     } catch (error) {
-      console.error("Error store getToken:", error);
+      console.error('Error store getToken:', error);
       throw error;
     }
 
     return null;
   },
-  login: async (data) => {
+  setToken: async (data) => {
     try {
-      const response = await login(data);
-      if (response) {
-        setCookies("tempUser", data.email);
+      if (data) {
+        setCookies('token', data);
       }
-      return response;
     } catch (error) {
-      console.error("Error store setToken:", error);
+      console.error('Error store setToken:', error);
+      throw error;
+    }
+  },
+  getUserCredential: async () => {
+    try {
+      const userCookie = await getCookies('user');
+      if (userCookie?.value) {
+        return JSON.parse(userCookie.value);
+      }
+    } catch (error) {
+      console.error('Error store getUserCredential:', error);
+      throw error;
+    }
+    return null;
+  },
+
+  setUserCredential: async (data) => {
+    try {
+      if (data) {
+        const userData = JSON.stringify(data);
+        setCookies('user', userData);
+      }
+    } catch (error) {
+      console.error('Error storing user credential:', error);
       throw error;
     }
   },
@@ -47,11 +69,11 @@ const useAuth = create<IAuthStore>((set, get) => ({
     try {
       const res = await logout();
       if (res) {
-        deleteCookie("isLoggedIn");
+        deleteCookie('isLoggedIn');
       }
       return res;
     } catch (error) {
-      console.error("Error store logout:", error);
+      console.error('Error store logout:', error);
       throw error;
     }
   },
@@ -69,21 +91,23 @@ export const useAuthPersist = create<IAuthPersistStore>()(
       checkMe: async () => {
         try {
           const me = await getMe();
+          const { setUserCredential } = useAuth.getState();
+          setUserCredential(me);
           setState((state) => ({
             ...state,
             me: me || {},
           }));
           return me;
         } catch (error) {
-          console.error("Error store checkMe:", error);
+          console.error('Error store checkMe:', error);
           throw error;
         }
       },
     }),
     {
-      name: "auth",
-    }
-  )
+      name: 'auth',
+    },
+  ),
 );
 
 export default useAuth;

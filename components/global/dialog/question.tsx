@@ -1,49 +1,71 @@
-import React, { useEffect } from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import useAuth from '@/stores/auth';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectValue,
-  SelectItem,
-  SelectTrigger,
-} from '@/components/ui/select';
 import { Form } from '@/components/ui/form';
-import { Coins } from 'lucide-react';
+import { Coins, Text } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
-const questionFormSchema = z.object({
-  bodyMd: z.string().min(10, 'Question must be at least 10 characters'),
-  bounty: z.string().nonempty('Please select a prize'),
-});
+export const makeQuestionFormSchema = (userBalance: number) =>
+  z.object({
+    title: z.string().min(5, 'Title must be at least 5 characters'),
+    bodyMd: z.string().min(10, 'Question must be at least 10 characters'),
+    bounty: z
+      .string()
+      .nonempty('Please insert bounty')
+      // Step 1: must be a valid number or decimal
+      .refine((val) => /^[0-9]*\.?[0-9]+$/.test(val), {
+        message: 'Bounty must be a valid number',
+      })
+      // Step 2: must not exceed wallet balance
+      .refine((val) => parseFloat(val) <= userBalance, {
+        message: `Bounty cannot exceed your wallet balance (${userBalance} ETH)`,
+      }),
+  });
 
 import useTheme from '@/stores/theme';
 import { CustomField } from '@/components/ui/form-field';
+import { Text as TextInput } from '@/components/ui/text';
+// import { createQuestion, getQuestionsList } from '@/services/menu/question';
+import { useCreateQuestion } from '@/hooks/menu/question';
+import { IQuestionPayload } from '@/types/menu/question';
 
 export default function QuestionDialog() {
   const { modalQuestion, setModalQuestion } = useTheme();
+  const { getUserCredential } = useAuth();
+  const [userBalance, setUserBalance] = useState(0);
 
+  const questionFormSchema = makeQuestionFormSchema(userBalance);
   const form = useForm<z.infer<typeof questionFormSchema>>({
     resolver: zodResolver(questionFormSchema),
     defaultValues: {
+      title: '',
       bodyMd: '',
       bounty: '',
     },
   });
 
-  const onSubmit = (data: z.infer<typeof questionFormSchema>) => {
-    console.log('Form Data:', data);
-    // Here you can call your mutation to submit the question
+  const { mutate: createQuestion } = useCreateQuestion();
+
+  const onSubmit = async (data: z.infer<typeof questionFormSchema>) => {
+    await createQuestion(data as IQuestionPayload);
     setModalQuestion(false);
     form.reset();
   };
+
+  useEffect(() => {}, [modalQuestion]);
+
   useEffect(() => {
-    console.log('Modal Question State:', modalQuestion);
-  }, [modalQuestion]);
+    (async () => {
+      const userCred = await getUserCredential();
+      setUserBalance(Number(userCred?.walletBalance?.eth) || 0);
+    })();
+  }, [getUserCredential]);
 
   return (
     <Dialog
@@ -57,6 +79,16 @@ export default function QuestionDialog() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="space-y-4">
+              <CustomField
+                name="title"
+                control={form.control}
+                render={({ field }) => (
+                  <TextInput
+                    placeholder="Write title here"
+                    {...field}
+                  />
+                )}
+              />
               <CustomField
                 name="bodyMd"
                 control={form.control}
@@ -73,25 +105,17 @@ export default function QuestionDialog() {
                     name={'bounty'}
                     control={form.control}
                     render={({ field }) => (
-                      <Select
-                        defaultValue="all"
+                      <TextInput
+                        placeholder="Write Bounty eg. 0.1"
                         {...field}
-                      >
-                        <SelectTrigger className="w-fit">
-                          <SelectValue placeholder="Select prize" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All</SelectItem>
-                          <SelectItem value="answered">Answered</SelectItem>
-                          <SelectItem value="unanswered">Unanswered</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      />
                     )}
                   />
-
                   <div>
                     <Coins className="inline-block mr-1 w-6 h-6 text-primary" />
-                    <span className="text-xs text-primary font-normal">you have 10 coins now</span>
+                    <span className="text-xs text-primary font-normal">
+                      you have {userBalance} coins now
+                    </span>
                   </div>
                 </div>
                 <Button

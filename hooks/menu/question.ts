@@ -1,11 +1,12 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getQuestionsList,
   getMyQuestions,
   getAnswerList,
   createQuestion,
+  getDetailQuestions,
 } from '@/services/menu/question';
-import { IQuestionPayload } from '@/types';
+import { IQuestionPayload, QuestionListResponse } from '@/types';
 
 export function useGetQuestionsList(params?: {
   keyword?: string;
@@ -13,7 +14,7 @@ export function useGetQuestionsList(params?: {
   status?: string;
   limit?: number;
 }) {
-  return useQuery({
+  return useQuery<QuestionListResponse, Error>({
     queryKey: ['questions', params],
     queryFn: () => getQuestionsList(params),
   });
@@ -26,15 +27,30 @@ export function useGetMyQuestions() {
   });
 }
 
-export function useCreateQuestion() {
-  return useMutation({
-    mutationFn: (data: IQuestionPayload) => createQuestion(data),
+export function useGetDetailQuestion(id: string, options?: object) {
+  return useQuery({
+    queryKey: ['question-detail', id],
+    queryFn: () => getDetailQuestions(id),
+    ...options,
   });
 }
 
-export function useGetAnswerList(questionId: number) {
+export function useCreateQuestion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: IQuestionPayload) => createQuestion(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['questions'],
+      });
+    },
+  });
+}
+
+export function useGetAnswerList(questionId?: string, options?: object) {
   return useQuery({
     queryKey: ['answer-list', questionId],
-    queryFn: () => getAnswerList(questionId),
+    queryFn: () => getAnswerList(questionId!),
+    ...options,
   });
 }

@@ -15,7 +15,6 @@ import { BookOpen, Coins, Crown } from 'lucide-react';
 
 import { subjects } from '@/constant/dashboard';
 import { Leaderboard } from '@/constant/dashboard';
-import { Question } from '@/constant/dashboard';
 
 import useTheme from '@/stores/theme';
 import { useGetQuestionsList } from '@/hooks/menu/question';
@@ -23,9 +22,9 @@ import Link from 'next/link';
 
 export default function Dashboard() {
   const { setModalQuestion } = useTheme();
-  const [status, setStatus] = useState<'all' | 'answered' | 'unanswered'>('all');
+  const [status, setStatus] = useState<'Open' | 'Verified' | 'Cancelled'>('Open');
 
-  const { data: questionsData } = useGetQuestionsList({ page: 1, limit: 10, status });
+  const { data: questions } = useGetQuestionsList({ page: 1, limit: 10, status });
 
   return (
     <div className="grid grid-cols-12 gap-6">
@@ -62,36 +61,51 @@ export default function Dashboard() {
           <Separator className="my-4" />
           <div className="flex justify-end">
             <Select
-              defaultValue="all"
-              onValueChange={(value) => setStatus(value as 'all' | 'answered' | 'unanswered')}
+              defaultValue="Open"
+              onValueChange={(value) => setStatus(value as 'Open' | 'Verified' | 'Cancelled')}
             >
               <SelectTrigger className="w-[180px] mb-4">
                 <SelectValue placeholder="Select Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="answered">Answered</SelectItem>
-                <SelectItem value="unanswered">Unanswered</SelectItem>
+                <SelectItem value="Open">Open</SelectItem>
+                <SelectItem value="Verified">Verified</SelectItem>
+                <SelectItem value="Cancelled">Cancelled</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          {Question.map((q) => (
+          {(questions?.data || []).map((q) => (
             <div key={q.id}>
               <div className="flex flex-row justify-between items-center">
                 <div className="flex flex-row gap-2 items-center">
                   <div className="w-10 h-10 rounded-full bg-blue-300" />
                   <div className="flex flex-col sm:flex-row gap-1 sm:items-center">
-                    <span className="text-sm font-medium">{q.username}</span>
+                    <span className="text-sm font-medium">{q.author.name}</span>
                     <div className="hidden sm:block w-1 h-1 bg-primary rounded-full" />
-                    <p className="text-xs font-normal text-slate-500">{q.time}</p>
+                    <p className="text-xs font-normal text-slate-500">
+                      {q?.createdAt && !isNaN(new Date(q.createdAt).getTime())
+                        ? new Date(q.createdAt).toLocaleString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                        : '—'}
+                    </p>
                   </div>
                 </div>
                 <Badge variant={'default'}>
-                  <Coins className="w-3 h-3" />+{q.prize}
+                  <p className="flex items-center gap-1 text-xs font-normal">
+                    <Coins className="w-3 h-3" />+
+                    {q?.bountyAmountWei && !isNaN(Number(q.bountyAmountWei))
+                      ? (Number(q.bountyAmountWei) / 1e18).toFixed(4)
+                      : '0.0000'}{' '}
+                  </p>
                   <span className="hidden lg:block">ETH</span>
                 </Badge>
               </div>
-              <p className="text-lg font-normal mt-4 mb-6">{q.question}</p>
+              <p className="text-lg font-normal mt-4 mb-6">{q.bodyMd}</p>
               <div className="flex justify-end">
                 <Link href={`/question/${q.id}`}>
                   <Button

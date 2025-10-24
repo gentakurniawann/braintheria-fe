@@ -1,16 +1,16 @@
-"use client";
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
+'use client';
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Search, UserCircle2 } from "lucide-react";
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Search, UserCircle2 } from 'lucide-react';
 
-import useAuth from "@/stores/auth";
-import useTheme from "@/stores/theme";
+import useAuth from '@/stores/auth';
+import useTheme from '@/stores/theme';
 
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function Navbar() {
   const { token } = useAuth();
@@ -19,7 +19,7 @@ export default function Navbar() {
 
   return (
     <nav className="w-full h-20 flex flex-row items-center justify-between px-6 lg:px-12 z-10 relative">
-      <Link href={"/"}>
+      <Link href={'/'}>
         <Image
           src="/images/Braintheria-logo.png"
           alt="braintheria-logo"
@@ -37,7 +37,7 @@ export default function Navbar() {
           {!isMobile && (
             <Button
               className=""
-              size={"lg"}
+              size={'lg'}
               onClick={() => setModalQuestion(true)}
             >
               Ask A Question
@@ -51,7 +51,7 @@ export default function Navbar() {
         <div>
           <ul>
             <li>
-              <Link href="/auth/login">Sign In</Link>
+              <Link href="/auth/sign-in">Sign In</Link>
             </li>
           </ul>
         </div>

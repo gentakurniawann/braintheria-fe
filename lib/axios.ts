@@ -1,14 +1,14 @@
-import axios from "axios";
-import useAuth from "@/stores/auth";
-import useTheme from "@/stores/theme";
-import { handleAxiosError } from "@/utils/handleAxiosError";
-import { sanitizeData, sanitizeUrl } from "@/utils/sanitizeData";
+import axios from 'axios';
+import useAuth from '@/stores/auth';
+import useTheme from '@/stores/theme';
+import { handleAxiosError } from '@/utils/handleAxiosError';
+import { sanitizeData, sanitizeUrl } from '@/utils/sanitizeData';
 
 const createAxiosInstance = () => {
   const instance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     withCredentials: true,
   });
@@ -30,20 +30,17 @@ const createAxiosInstance = () => {
       }
 
       // Sanitize request data if present
-      if (
-        config.data &&
-        config.headers["Content-Type"] === "application/json"
-      ) {
+      if (config.data && config.headers['Content-Type'] === 'application/json') {
         config.data = sanitizeData(config.data);
       }
 
       if (token) {
-        config.headers["Authorization"] = `Bearer ${token}`;
+        config.headers['Authorization'] = `Bearer ${token}`;
       }
       return config;
     },
     (error) => {
-      console.error("Request error:", error);
+      console.error('Request error:', error);
       return Promise.reject(error);
     },
   );

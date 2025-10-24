@@ -1,18 +1,34 @@
-import axios from '@/lib/axios';  
-
-import { IAnswer, IQuestion, IQuestionPayload, Response } from '@/types';
+import axios from '@/lib/axios';
+import {
+  IAnswer,
+  IQuestion,
+  IQuestionPayload,
+  QuestionDetailResponse,
+  QuestionListResponse,
+  Response,
+} from '@/types';
 
 export async function getQuestionsList(params?: {
   keyword?: string;
   status?: string;
   page?: number;
   page_size?: number;
-}): Promise<Response<IQuestion[]>> {
+}): Promise<QuestionListResponse> {
   try {
-    const response = await axios.get('/questions', { params });
+    const response = await axios.get<QuestionListResponse>('/questions', { params });
     return response.data;
   } catch (error) {
     console.error('Error fetching questions:', error);
+    throw error;
+  }
+}
+
+export async function getDetailQuestions(id: string): Promise<IQuestion> {
+  try {
+    const response = await axios.get<IQuestion>(`/questions/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching question detail (ID: ${id}):`, error);
     throw error;
   }
 }
@@ -37,7 +53,7 @@ export async function createQuestion(data: IQuestionPayload): Promise<Response<I
   }
 }
 
-export async function getAnswerList(questionId: number): Promise<Response<IAnswer[]>> {
+export async function getAnswerList(questionId: string): Promise<Response<IAnswer[]>> {
   try {
     const response = await axios.get(`/questions/answers/${questionId}`);
     return response.data;

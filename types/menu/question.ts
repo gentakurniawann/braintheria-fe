@@ -1,10 +1,23 @@
+import { ApiResponse } from '../global/api';
+
+export type QuestionListResponse = ApiResponse<IQuestion[]>;
+export type QuestionDetailResponse = ApiResponse<IQuestion>;
+
 export interface IQuestionStore {
   modalAnswer: boolean;
   setModalAnswer: (open: boolean) => void;
 }
 
+type Author = {
+  id: string;
+  name: string;
+  email: string;
+  primaryWallet: string;
+};
+
 export interface IQuestion {
   id: number;
+  author: Author;
   authorId: number;
   title: string;
   bodyMd: string;
