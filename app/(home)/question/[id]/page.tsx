@@ -1,5 +1,5 @@
 'use client';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Image from 'next/image';
 
 import { Card } from '@/components/ui/card';
@@ -33,6 +33,9 @@ export default function Question() {
   const { data: question } = useGetDetailQuestion(id!, queryOptions);
   const { data: answer } = useGetAnswerList(id!, queryOptions);
 
+  useEffect(() => {
+    console.log(answer);
+  }, [question, answer]);
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-7 lg:col-start-2">
@@ -104,7 +107,7 @@ export default function Question() {
               </Button>
             </div>
           </Card>
-          {answer?.data?.answers?.map((answer, index) => (
+          {answer?.answers?.map((answer, index) => (
             <Card
               className="glass-background p-6 rounded-2xl w-full"
               key={index}
@@ -122,7 +125,7 @@ export default function Question() {
               <div className="flex flex-row gap-2 items-center mb-4">
                 <div className="w-10 h-10 rounded-full bg-blue-300" />
                 <div>
-                  <span className="text-sm font-medium">{}</span>
+                  <span className="text-sm font-medium">{answer.author.email}</span>
                   <p className="text-xs font-normal text-slate-500">
                     {' '}
                     {answer?.createdAt && !isNaN(new Date(answer.createdAt).getTime())

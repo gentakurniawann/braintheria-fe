@@ -1,6 +1,7 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { useAccount } from 'wagmi';
 
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -11,9 +12,12 @@ import { Badge } from '@/components/ui/badge';
 import { Coins } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export default function Profile() {
-  const { user, getUserCredential } = useAuth();
+  const { user, getUserCredential, integrateWallet } = useAuth();
+  const { address, isConnected } = useAccount();
+  const integratedWalletRef = useRef<string | null>(null);
 
   const { data: myQuestions } = useGetMyQuestions();
 
@@ -21,6 +25,24 @@ export default function Profile() {
     getUserCredential();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Handle wallet integration when wallet is connected
+  useEffect(() => {
+    const handleWalletIntegration = async () => {
+      if (isConnected && address && integratedWalletRef.current !== address) {
+        try {
+          await integrateWallet(address);
+          integratedWalletRef.current = address;
+          console.log('Wallet integrated successfully');
+        } catch (error) {
+          console.error('Failed to integrate wallet:', error);
+        }
+      }
+    };
+
+    handleWalletIntegration();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, address]);
 
   return (
     <div className="grid grid-cols-12 gap-6">
@@ -37,6 +59,11 @@ export default function Profile() {
             <h4 className="text-lg font-bold">{user?.username}</h4>
             <p className="text-sm text-slate-500">{user?.email}</p>
           </div>
+          <Separator className="my-4" />
+          <ConnectButton
+            chainStatus={'icon'}
+            accountStatus={'avatar'}
+          />
         </Card>
       </div>
       <div className="col-span-12 lg:col-span-9">

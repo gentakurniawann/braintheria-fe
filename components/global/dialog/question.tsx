@@ -1,15 +1,21 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import useAuth from '@/stores/auth';
+import { useAccount, useBalance } from 'wagmi';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
 import { Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+
+import useTheme from '@/stores/theme';
+import { CustomField } from '@/components/ui/form-field';
+import { Text as TextInput } from '@/components/ui/text';
+import { useCreateQuestion } from '@/hooks/menu/question';
+import { IQuestionPayload } from '@/types/menu/question';
 
 export const makeQuestionFormSchema = (userBalance: number) =>
   z.object({
@@ -26,18 +32,14 @@ export const makeQuestionFormSchema = (userBalance: number) =>
       }),
   });
 
-import useTheme from '@/stores/theme';
-import { CustomField } from '@/components/ui/form-field';
-import { Text as TextInput } from '@/components/ui/text';
-import { useCreateQuestion } from '@/hooks/menu/question';
-import { IQuestionPayload } from '@/types/menu/question';
-
 export default function QuestionDialog() {
   const { modalQuestion, setModalQuestion } = useTheme();
-  const { getUserCredential } = useAuth();
-  const [userBalance, setUserBalance] = useState(0);
+  const { address } = useAccount();
+  const { data: userBalance } = useBalance({
+    address: address,
+  });
 
-  const questionFormSchema = makeQuestionFormSchema(userBalance);
+  const questionFormSchema = makeQuestionFormSchema(Number(userBalance?.decimals) || 0);
   const form = useForm<z.infer<typeof questionFormSchema>>({
     resolver: zodResolver(questionFormSchema),
     defaultValues: {
@@ -56,13 +58,6 @@ export default function QuestionDialog() {
   };
 
   useEffect(() => {}, [modalQuestion]);
-
-  useEffect(() => {
-    (async () => {
-      const userCred = await getUserCredential();
-      setUserBalance(Number(userCred?.walletBalance?.eth) || 0);
-    })();
-  }, [getUserCredential]);
 
   return (
     <Dialog
@@ -111,7 +106,9 @@ export default function QuestionDialog() {
                   <div>
                     <Coins className="inline-block mr-1 w-6 h-6 text-primary" />
                     <span className="text-xs text-primary font-normal">
-                      you have {userBalance} coins now
+                      you have{' '}
+                      {userBalance?.formatted ? parseFloat(userBalance.formatted).toFixed(4) : 0} coins
+                      now
                     </span>
                   </div>
                 </div>
