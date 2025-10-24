@@ -22,7 +22,7 @@ import Link from 'next/link';
 
 export default function Dashboard() {
   const { setModalQuestion } = useTheme();
-  const [status, setStatus] = useState<'Open' | 'Verified' | 'Cancelled'>('Open');
+  const [status, setStatus] = useState<'All' | 'Open' | 'Verified' | 'Cancelled'>('All');
 
   const { data: questions } = useGetQuestionsList({ page: 1, limit: 10, status });
 
@@ -61,13 +61,16 @@ export default function Dashboard() {
           <Separator className="my-4" />
           <div className="flex justify-end">
             <Select
-              defaultValue="Open"
-              onValueChange={(value) => setStatus(value as 'Open' | 'Verified' | 'Cancelled')}
+              defaultValue="All"
+              onValueChange={(value) =>
+                setStatus(value as 'All' | 'Open' | 'Verified' | 'Cancelled')
+              }
             >
               <SelectTrigger className="w-[180px] mb-4">
                 <SelectValue placeholder="Select Type" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="All">All</SelectItem>
                 <SelectItem value="Open">Open</SelectItem>
                 <SelectItem value="Verified">Verified</SelectItem>
                 <SelectItem value="Cancelled">Cancelled</SelectItem>
