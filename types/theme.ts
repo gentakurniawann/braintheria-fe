@@ -9,13 +9,21 @@ interface IModalSuccess {
   action?: () => void;
 }
 
+export interface IModalDelete {
+  open: boolean;
+  title?: string;
+  message?: string;
+  action?: () => void;
+}
 export interface IThemeStore {
   isLoading: boolean;
   modalSuccess: IModalSuccess;
   modalQuestion: boolean;
+  modalDelete: IModalDelete;
   setLoading: (loading: boolean) => void;
   setModalSuccess: (params: IModalSuccess) => void;
   setModalQuestion: (open: boolean) => void;
+  setModalDelete: (modal: IModalDelete) => void;
 }
 
 // Response type
@@ -25,11 +33,11 @@ export type Meta = {
 };
 interface Pagination {
   total: number;
-  count: number;
-  page_size: number;
-  current_page: number;
-  total_pages: number;
-  links?: { next: string | null; previous: string | null };
+  page: number;
+  limit: number;
+  totalPages: number;
+  filter: string;
+  search: string | null;
 }
 
 export interface Response<T = unknown> {

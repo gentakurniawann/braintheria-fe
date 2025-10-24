@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Form } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 
+import useTheme from '@/stores/theme';
 import useQuestion from '@/stores/menu/question';
 import { useCreateAnswer } from '@/hooks/menu/question';
 
@@ -28,6 +29,7 @@ export const answerFormSchema = () => {
 };
 
 export default function AnswerDialog({ question, questionId }: IAnswerDialogProps) {
+  const { setModalSuccess } = useTheme();
   const { modalAnswer, setModalAnswer } = useQuestion();
   const form = useForm<z.infer<ReturnType<typeof answerFormSchema>>>({
     resolver: zodResolver(answerFormSchema()),
@@ -39,14 +41,32 @@ export default function AnswerDialog({ question, questionId }: IAnswerDialogProp
   const { mutate: createAnswer } = useCreateAnswer(questionId.toString());
 
   const onSubmit = async (data: z.infer<ReturnType<typeof answerFormSchema>>) => {
-    createAnswer({ questionId, bodyMd: data?.bodyMd });
+    createAnswer(
+      { questionId, bodyMd: data?.bodyMd },
+      {
+        onSuccess: () => {
+          setModalSuccess({
+            title: 'Answer Submitted',
+            message: 'Your answer has been submitted successfully.',
+            open: true,
+            animation: 'success',
+          });
+          form.reset();
+        },
+      },
+    );
     setModalAnswer(false);
+  };
+
+  const handleClose = () => {
+    setModalAnswer(false);
+    form.reset();
   };
 
   return (
     <Dialog
       open={modalAnswer}
-      onOpenChange={setModalAnswer}
+      onOpenChange={handleClose}
     >
       <DialogContent className="!max-w-5xl">
         <DialogHeader>
@@ -58,18 +78,20 @@ export default function AnswerDialog({ question, questionId }: IAnswerDialogProp
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <div className="grid grid-cols-12 gap-4 items-stretch">
-              <div className="col-span-4">
+              <div className="col-span-12 lg:col-span-4">
                 <h4 className="text-lg font-medium">Question</h4>
-                <p className="text-lg font-normal">{question}</p>
+                <p className="text-lg font-normal max-h-72 overflow-hidden overflow-y-auto">
+                  {question}
+                </p>
               </div>
-              <div className="col-span-8 ">
+              <div className="col-span-12 lg:col-span-8 h-full">
                 <CustomField
                   control={form.control}
                   name="bodyMd"
                   render={({ field }) => (
                     <Textarea
                       placeholder="Write your answer here"
-                      className="h-full"
+                      className="h-72"
                       {...field}
                     />
                   )}

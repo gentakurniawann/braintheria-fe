@@ -42,7 +42,7 @@ interface QuestionDialogProps {
 }
 
 export default function QuestionDialog({ questionToEdit }: QuestionDialogProps) {
-  const { modalQuestion, setModalQuestion } = useTheme();
+  const { modalQuestion, setModalQuestion, setModalSuccess } = useTheme();
   const { address } = useAccount();
   const { data: userBalance } = useBalance({ address });
 
@@ -74,11 +74,20 @@ export default function QuestionDialog({ questionToEdit }: QuestionDialogProps) 
     if (isEditing && questionToEdit) {
       await updateQuestion({ id: questionToEdit.id.toString(), ...payload });
     } else {
-      await createQuestion(payload);
+      createQuestion(payload, {
+      onSuccess: () => {
+        setModalSuccess({
+          title: 'Question Submitted',
+          message: 'Your question has been submitted successfully.',
+          open: true,
+          animation: 'success',
+        });
+        form.reset();
+      },
+    });
     }
 
     setModalQuestion(false);
-    form.reset();
   };
 
   useEffect(() => {
@@ -120,6 +129,7 @@ export default function QuestionDialog({ questionToEdit }: QuestionDialogProps) 
                 render={({ field }) => (
                   <Textarea
                     placeholder="Write your question here"
+                    className="h-56"
                     {...field}
                   />
                 )}

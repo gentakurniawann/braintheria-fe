@@ -4,19 +4,17 @@ import Image from 'next/image';
 
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Coins, Crown, EllipsisVertical, Pencil, Plus, UserCircle2 } from 'lucide-react';
+import { Coins, EllipsisVertical, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-
 import AnswerDialog from '@/components/global/dialog/answer';
+import Leaderboard from '@/components/global/section/leaderboard';
 
 import useQuestion from '@/stores/menu/question';
-import { Leaderboard } from '@/constant/dashboard';
 import { useParams } from 'next/navigation';
 import {
   useGetAnswerList,
   useGetDetailQuestion,
-  useGetLeaderboard,
   useValidateQuestions,
 } from '@/hooks/menu/question';
 import {
@@ -30,6 +28,7 @@ import useTheme from '@/stores/theme';
 import QuestionDialog from '@/components/global/dialog/question';
 
 export default function Question() {
+  const { setModalSuccess, setModalDelete } = useTheme();
   const { setModalAnswer } = useQuestion();
   const { setModalQuestion } = useTheme();
 
@@ -49,7 +48,19 @@ export default function Question() {
   const { data: question } = useGetDetailQuestion(id!, queryOptions);
   const { data: answer } = useGetAnswerList(id!, queryOptions);
   const { mutate: validateAnswer, isPending } = useValidateQuestions(id!);
-  const { data: leaderboard, isLoading, error } = useGetLeaderboard();
+
+  const handleValidate = (answerId: string) => {
+    validateAnswer(answerId, {
+      onSuccess: () => {
+        setModalSuccess({
+          title: 'Answer Validated',
+          message: 'The answer has been validated successfully.',
+          open: true,
+          animation: 'success',
+        });
+      },
+    });
+  };
 
   useEffect(() => {}, [question, answer]);
   return (
@@ -100,7 +111,22 @@ export default function Question() {
                         Edit
                       </DropdownMenuItem>
                       <Separator />
-                      <DropdownMenuItem className="!text-red-500">Drop</DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="!text-red-500"
+                        onClick={() => {
+                          setModalDelete({
+                            open: true,
+                            title: 'Delete Question',
+                            message:
+                              'Are you sure you want to delete this question? This action cannot be undone.',
+                            action: async () => {
+                              // Implement delete question logic here
+                            },
+                          });
+                        }}
+                      >
+                        Delete
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}
@@ -157,15 +183,24 @@ export default function Question() {
             >
               <div className="flex flex-row justify-between items-center">
                 <h4 className="text-lg font-bold">Answer</h4>
-                {question?.isAuthor && question?.status === 'Open' && (
+                {question?.isAuthor && question?.status === 'Open' ? (
                   <Button
                     size={'sm'}
                     variant={'outline'}
-                    onClick={() => validateAnswer(answer.id.toString())}
+                    onClick={() => handleValidate(answer.id.toString())}
                     disabled={isPending}
                   >
                     {isPending ? 'Validating...' : 'Validate'}
                   </Button>
+                ) : (
+                  answer.isBest && (
+                    <Badge
+                      variant={'success'}
+                      className="min-w-20"
+                    >
+                      Verified
+                    </Badge>
+                  )
                 )}
               </div>
               <Separator className="my-4" />
@@ -193,27 +228,7 @@ export default function Question() {
         </div>
       </div>
       <div className="col-span-12 lg:col-span-3">
-        <Card className="glass-background p-6 rounded-2xl w-full">
-          <div className="flex gap-2 items-center">
-            <Crown className="h-6 w-6" />
-            <h4 className="text-lg font-bold">Leaderboard</h4>
-          </div>
-          <Separator className="my-4" />
-          <ul>
-            {leaderboard?.map((user, idx) => (
-              <li
-                key={idx}
-                className="text-sm py-1 px-2"
-              >
-                {user?.name}
-                <span className="float-right font-medium">
-                  {user?._count?.answers}
-                  <Coins className="inline-block w-3 h-3 ml-2" />
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Card>
+        <Leaderboard />
       </div>
       <AnswerDialog
         question={question?.bodyMd || ''}
