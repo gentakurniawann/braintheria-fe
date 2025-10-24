@@ -1,7 +1,9 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
+import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,11 +14,28 @@ import { Separator } from '@/components/ui/separator';
 import Leaderboard from '@/components/global/section/leaderboard';
 
 import { useGetQuestionsList } from '@/hooks/menu/question';
+import { PaginationCompo } from '@/components/ui/pagination';
 
 export default function Search() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
-  const { data: questions } = useGetQuestionsList({ page: 1, limit: 10, search: searchQuery });
+
+  const [get, set] = useQueryStates({
+    page: parseAsInteger.withDefault(1),
+    limit: parseAsInteger.withDefault(10),
+    search: parseAsString,
+  });
+
+  const handlePageChange = ({ page, limit }: { page: number; limit: number }) => {
+    set({ page });
+    set({ limit });
+  };
+
+  const { data: questions } = useGetQuestionsList({
+    page: get.page,
+    limit: get.limit,
+    search: searchQuery,
+  });
 
   return (
     <div className="grid grid-cols-12 gap-6">
@@ -28,7 +47,13 @@ export default function Search() {
             <div key={q.id}>
               <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div className="flex flex-row gap-2 items-center">
-                  <div className="w-10 h-10 rounded-full bg-blue-300" />
+                  <Image
+                    src={'/images/unavailable-profile.png'}
+                    alt={'unavailable-profile'}
+                    className="w-10 h-10 rounded-full"
+                    width={40}
+                    height={40}
+                  />
                   <div className="flex flex-col sm:flex-row gap-1 sm:items-center">
                     <span className="text-sm font-medium">{q.author.name}</span>
                     <div className="hidden sm:block w-1 h-1 bg-primary rounded-full" />
@@ -86,6 +111,19 @@ export default function Search() {
               <Separator className="my-4" />
             </div>
           ))}
+          <PaginationCompo
+            meta={{
+              pagination: {
+                page: questions?.meta?.page || 1,
+                limit: questions?.meta?.limit || 10,
+                totalPages: questions?.meta?.totalPages || 0,
+                total: questions?.meta?.total || 0,
+                filter: questions?.meta?.filter || '',
+                search: questions?.meta?.search || '',
+              },
+            }}
+            onPageChange={handlePageChange}
+          />
         </Card>
       </div>
       <div className="col-span-12 lg:col-span-3">

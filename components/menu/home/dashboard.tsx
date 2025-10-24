@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 
 import { Card } from '@/components/ui/card';
@@ -18,7 +19,6 @@ import { Coins } from 'lucide-react';
 import useTheme from '@/stores/theme';
 import { useGetQuestionsList } from '@/hooks/menu/question';
 import Link from 'next/link';
-import QuestionDialog from '@/components/global/dialog/question';
 import { PaginationCompo } from '@/components/ui/pagination';
 
 export default function Dashboard() {
@@ -80,7 +80,13 @@ export default function Dashboard() {
             <div key={q.id}>
               <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div className="flex flex-row gap-2 items-center">
-                  <div className="w-10 h-10 rounded-full bg-blue-300" />
+                  <Image
+                    src={'/images/unavailable-profile.png'}
+                    alt={'unavailable-profile'}
+                    className="w-10 h-10 rounded-full"
+                    width={40}
+                    height={40}
+                  />
                   <div className="flex flex-col sm:flex-row gap-1 sm:items-center">
                     <span className="text-sm font-medium">{q.author.name}</span>
                     <div className="hidden sm:block w-1 h-1 bg-primary rounded-full" />

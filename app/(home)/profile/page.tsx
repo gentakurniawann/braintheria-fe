@@ -13,7 +13,6 @@ import { Coins } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { ca } from 'zod/v4/locales';
 
 export default function Profile() {
   const { user, getUserCredential, integrateWallet } = useAuth();
@@ -81,9 +80,15 @@ export default function Profile() {
           <Separator className="my-4" />
           {(myQuestions?.data || []).map((q) => (
             <div key={q.id}>
-              <div className="flex flex-row justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div className="flex flex-row gap-2 items-center">
-                  <div className="w-10 h-10 rounded-full bg-blue-300" />
+                  <Image
+                    src={'/images/unavailable-profile.png'}
+                    alt={'unavailable-profile'}
+                    className="w-10 h-10 rounded-full"
+                    width={40}
+                    height={40}
+                  />
                   <div className="flex flex-col sm:flex-row gap-1 sm:items-center">
                     <span className="text-sm font-medium">{q.author.name}</span>
                     <div className="hidden sm:block w-1 h-1 bg-primary rounded-full" />
@@ -100,17 +105,33 @@ export default function Profile() {
                     </p>
                   </div>
                 </div>
-                <Badge variant={'default'}>
-                  <p className="flex items-center gap-1 text-xs font-normal">
-                    <Coins className="w-3 h-3" />+
-                    {q?.bountyAmountWei && !isNaN(Number(q.bountyAmountWei))
-                      ? (Number(q.bountyAmountWei) / 1e18).toFixed(4)
-                      : '0.0000'}{' '}
-                  </p>
-                  <span className="hidden lg:block">ETH</span>
-                </Badge>
+                <div className="flex flex-row gap-2">
+                  <Badge
+                    variant={
+                      q?.status === 'Open'
+                        ? 'open'
+                        : q?.status === 'Verified'
+                          ? 'success'
+                          : q?.status === 'Cancelled'
+                            ? 'destructive'
+                            : 'default'
+                    }
+                    className="min-w-20"
+                  >
+                    {q.status}
+                  </Badge>
+                  <Badge variant={'default'}>
+                    <p className="flex items-center gap-1 text-xs font-normal">
+                      <Coins className="w-3 h-3" />+
+                      {q?.bountyAmountWei && !isNaN(Number(q.bountyAmountWei))
+                        ? (Number(q.bountyAmountWei) / 1e18).toFixed(4)
+                        : '0.0000'}{' '}
+                    </p>
+                    <span className="hidden lg:block">ETH</span>
+                  </Badge>
+                </div>
               </div>
-              <p className="text-lg font-normal mt-4 mb-6">{q.bodyMd}</p>
+              <p className="text-lg font-normal mt-4 mb-6 truncate">{q.bodyMd}</p>
               <div className="flex justify-end">
                 <Link href={`/question/${q.id}`}>
                   <Button
@@ -118,11 +139,11 @@ export default function Profile() {
                     className="max-w-32"
                     variant={'outline'}
                   >
-                    View Detail
+                    Detail
                   </Button>
                 </Link>
               </div>
-              <Separator className="my-4 last:hidden" />
+              <Separator className="my-4" />
             </div>
           ))}
         </Card>

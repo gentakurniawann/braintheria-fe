@@ -73,7 +73,13 @@ export default function Question() {
           <Card className="glass-background p-6 rounded-2xl w-full">
             <div className="flex flex-row justify-between items-center">
               <div className="flex flex-row gap-2 items-center">
-                <div className="w-10 h-10 rounded-full bg-blue-300" />
+                <Image
+                  src={'/images/unavailable-profile.png'}
+                  alt={'unavailable-profile'}
+                  className="w-10 h-10 rounded-full"
+                  width={40}
+                  height={40}
+                />
                 <div className="flex flex-col sm:flex-row gap-1 sm:items-center">
                   <span className="text-sm font-medium">{question?.author?.name}</span>
                   <div className="hidden sm:block w-1 h-1 bg-primary rounded-full" />
@@ -91,6 +97,20 @@ export default function Question() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                <Badge
+                  variant={
+                    question?.status === 'Open'
+                      ? 'open'
+                      : question?.status === 'Verified'
+                        ? 'success'
+                        : question?.status === 'Cancelled'
+                          ? 'destructive'
+                          : 'default'
+                  }
+                  className="min-w-20"
+                >
+                  {question?.status}
+                </Badge>
                 <Badge variant={'default'}>
                   <Coins className="w-3 h-3" />
                   {question?.bountyAmountWei && !isNaN(Number(question.bountyAmountWei))

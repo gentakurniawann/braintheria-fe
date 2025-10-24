@@ -140,25 +140,20 @@ const PaginationCompo = ({
   onPageChange,
   className,
 }: TPaginationProps) => {
-  const { page, totalPages, total } = meta.pagination;
-
-  // Menghitung jumlah halaman untuk lompatan berdasarkan total halaman
+  const { page, totalPages } = meta.pagination;
   const calculateJumpSize = () => {
     if (totalPages <= 10) return 2;
     if (totalPages <= 20) return 3;
     if (totalPages <= 50) return 5;
-    return Math.floor(totalPages / 10); // Lompatan 10% dari total halaman
+    return Math.floor(totalPages / 10); 
   };
 
   const jumpSize = calculateJumpSize();
-
-  // Handler untuk melompat beberapa halaman ke belakang
   const handleJumpBack = () => {
     const newPage = Math.max(1, page - jumpSize);
     onPageChange({ page: newPage, limit: meta.pagination.limit });
   };
 
-  // Handler untuk melompat beberapa halaman ke depan
   const handleJumpForward = () => {
     const newPage = Math.min(totalPages, page + jumpSize);
     onPageChange({ page: newPage, limit: meta.pagination.limit });
@@ -166,7 +161,7 @@ const PaginationCompo = ({
 
   const getPageNumbers = () => {
     const pageNumbers = [];
-    const visiblePages = 5; // Jumlah halaman yang ditampilkan (tidak termasuk ellipsis)
+    const visiblePages = 5; 
 
     let startPage = Math.max(1, page - Math.floor(visiblePages / 2));
     let endPage = startPage + visiblePages - 1;
@@ -176,18 +171,15 @@ const PaginationCompo = ({
       startPage = Math.max(1, endPage - visiblePages + 1);
     }
 
-    // Tambahkan halaman pertama jika start page > 1
     if (startPage > 1) {
       pageNumbers.push(1);
       if (startPage > 2) pageNumbers.push('ellipsis1');
     }
 
-    // Tambahkan halaman-halaman tengah
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(i);
     }
 
-    // Tambahkan halaman terakhir jika end page < totalPages
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) pageNumbers.push('ellipsis2');
       pageNumbers.push(totalPages);
