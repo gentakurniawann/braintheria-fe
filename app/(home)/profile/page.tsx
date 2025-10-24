@@ -13,6 +13,7 @@ import { Coins } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ca } from 'zod/v4/locales';
 
 export default function Profile() {
   const { user, getUserCredential, integrateWallet } = useAuth();
@@ -33,9 +34,17 @@ export default function Profile() {
         try {
           await integrateWallet(address);
           integratedWalletRef.current = address;
-          console.log('Wallet integrated successfully');
         } catch (error) {
           console.error('Failed to integrate wallet:', error);
+        }
+      }
+
+      if (!isConnected) {
+        try {
+          await integrateWallet('');
+          integratedWalletRef.current = null;
+        } catch (error) {
+          console.error('Failed to disconnect wallet:', error);
         }
       }
     };

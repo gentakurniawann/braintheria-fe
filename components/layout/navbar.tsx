@@ -82,7 +82,6 @@ export default function Navbar() {
             >
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem>Wallet</DropdownMenuItem>
             <Separator className="my-1" />
             <DropdownMenuItem
               onClick={() => logout()}

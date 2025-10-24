@@ -13,6 +13,11 @@ const useTheme = create<IThemeStore>((set) => ({
     actionVariant: 'outline',
     animation: 'success',
   },
+  modalDelete: {
+    open: false,
+    type: '',
+    action: () => {},
+  },
   modalQuestion: false,
 
   // actions
@@ -31,6 +36,9 @@ const useTheme = create<IThemeStore>((set) => ({
         animation,
       },
     }),
+  setModalDelete: (modal) => {
+    set({ modalDelete: modal });
+  },
   setModalQuestion: (open) => {
     set({ modalQuestion: open });
   },

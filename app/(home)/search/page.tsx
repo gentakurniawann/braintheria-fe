@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Coins } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
+import Leaderboard from '@/components/global/section/leaderboard';
+
 import { useGetQuestionsList } from '@/hooks/menu/question';
 
 export default function Search() {
@@ -18,13 +20,13 @@ export default function Search() {
 
   return (
     <div className="grid grid-cols-12 gap-6">
-      <div className="col-span-12 lg:col-span-8 lg:col-start-3">
+      <div className="col-span-12 lg:col-span-7 lg:col-start-2">
         <Card className="glass-background p-6 rounded-2xl w-full">
           <h2 className="text-lg font-bold">Search Results</h2>
           <Separator className="my-4" />
           {(questions?.data || []).map((q) => (
             <div key={q.id}>
-              <div className="flex flex-row justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div className="flex flex-row gap-2 items-center">
                   <div className="w-10 h-10 rounded-full bg-blue-300" />
                   <div className="flex flex-col sm:flex-row gap-1 sm:items-center">
@@ -43,17 +45,33 @@ export default function Search() {
                     </p>
                   </div>
                 </div>
-                <Badge variant={'default'}>
-                  <p className="flex items-center gap-1 text-xs font-normal">
-                    <Coins className="w-3 h-3" />+
-                    {q?.bountyAmountWei && !isNaN(Number(q.bountyAmountWei))
-                      ? (Number(q.bountyAmountWei) / 1e18).toFixed(4)
-                      : '0.0000'}{' '}
-                  </p>
-                  <span className="hidden lg:block">ETH</span>
-                </Badge>
+                <div className="flex flex-row gap-2">
+                  <Badge
+                    variant={
+                      q?.status === 'Open'
+                        ? 'open'
+                        : q?.status === 'Verified'
+                          ? 'success'
+                          : q?.status === 'Cancelled'
+                            ? 'destructive'
+                            : 'default'
+                    }
+                    className="min-w-20"
+                  >
+                    {q.status}
+                  </Badge>
+                  <Badge variant={'default'}>
+                    <p className="flex items-center gap-1 text-xs font-normal">
+                      <Coins className="w-3 h-3" />+
+                      {q?.bountyAmountWei && !isNaN(Number(q.bountyAmountWei))
+                        ? (Number(q.bountyAmountWei) / 1e18).toFixed(4)
+                        : '0.0000'}{' '}
+                    </p>
+                    <span className="hidden lg:block">ETH</span>
+                  </Badge>
+                </div>
               </div>
-              <p className="text-lg font-normal mt-4 mb-6">{q.bodyMd}</p>
+              <p className="text-lg font-normal mt-4 mb-6 truncate">{q.bodyMd}</p>
               <div className="flex justify-end">
                 <Link href={`/question/${q.id}`}>
                   <Button
@@ -61,7 +79,7 @@ export default function Search() {
                     className="max-w-32"
                     variant={'outline'}
                   >
-                    Answer
+                    {q.isAuthor || q.status === 'Verified' ? 'Detail' : 'Answer'}
                   </Button>
                 </Link>
               </div>
@@ -69,6 +87,9 @@ export default function Search() {
             </div>
           ))}
         </Card>
+      </div>
+      <div className="col-span-12 lg:col-span-3">
+        <Leaderboard />
       </div>
     </div>
   );

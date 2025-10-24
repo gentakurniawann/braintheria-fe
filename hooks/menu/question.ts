@@ -60,12 +60,16 @@ export function useCreateQuestion() {
   });
 }
 
+
 export function useDeleteQuestion() {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (id: number) => deleteQuestion(id),
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
+      // invalidate the question list
       queryClient.invalidateQueries({ queryKey: ['questions'] });
+      // invalidate the specific question that was deleted
       queryClient.invalidateQueries({ queryKey: ['question-detail', id] });
     },
   });
