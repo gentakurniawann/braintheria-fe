@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { logout, getMe } from '@/services/auth';
+import { getMe } from '@/services/auth';
 import { getCookies, setCookies, deleteCookie } from '@/utils/cookie';
 import { IAuthStore, IAuthPersistStore, TResponseMe } from '@/types/auth';
 
@@ -9,7 +9,7 @@ const useAuth = create<IAuthStore>((set, get) => ({
   // state
   token: '',
   wsToken: '',
-  tempUser: '',
+  user: null,
 
   // actions
   getToken: async () => {
@@ -45,7 +45,7 @@ const useAuth = create<IAuthStore>((set, get) => ({
     try {
       const userCookie = await getCookies('user');
       if (userCookie?.value) {
-        return JSON.parse(userCookie.value);
+        set({ user: JSON.parse(userCookie.value) });
       }
     } catch (error) {
       console.error('Error store getUserCredential:', error);
@@ -67,11 +67,7 @@ const useAuth = create<IAuthStore>((set, get) => ({
   },
   logout: async () => {
     try {
-      const res = await logout();
-      if (res) {
-        deleteCookie('isLoggedIn');
-      }
-      return res;
+      deleteCookie('isLoggedIn');
     } catch (error) {
       console.error('Error store logout:', error);
       throw error;

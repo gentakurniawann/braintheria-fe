@@ -1,15 +1,15 @@
 import axios from '@/lib/axios';
-import { TResponseLogin, TResponseMe } from '@/types';
+import { TResponseMe } from '@/types';
 
-export async function logout(): Promise<TResponseLogin> {
-  try {
-    const response = await axios.post('/auth/logout');
-    return response.data;
-  } catch (error) {
-    console.error('Error from logout: ', error);
-    throw error;
-  }
-}
+// export async function logout(): Promise<TResponseLogin> {
+//   try {
+//     const response = await axios.post('/auth/logout');
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error from logout: ', error);
+//     throw error;
+//   }
+// }
 
 export async function getMe(): Promise<TResponseMe> {
   try {

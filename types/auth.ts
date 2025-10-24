@@ -1,11 +1,12 @@
 export interface IAuthStore {
   token: string;
   wsToken: string;
+  user: TResponseMe | null;
   getToken: () => Promise<string | null>;
   setToken: (token: string) => void;
   getUserCredential: () => Promise<TResponseMe | null>;
-  setUserCredential: (token: TResponseMe) => void;
-  logout: () => Promise<TResponseLogin>;
+  setUserCredential: (user: TResponseMe) => void;
+  logout: () => void;
 }
 export interface IAuthPersistStore {
   checkMe: () => Promise<TResponseMe>;
