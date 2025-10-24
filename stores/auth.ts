@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { getMe } from '@/services/auth';
+import { getMe, integrateWallet } from '@/services/auth';
 import { getCookies, setCookies, deleteCookie } from '@/utils/cookie';
 import { IAuthStore, IAuthPersistStore, TResponseMe } from '@/types/auth';
 
@@ -67,9 +67,20 @@ const useAuth = create<IAuthStore>((set, get) => ({
   },
   logout: async () => {
     try {
-      deleteCookie('isLoggedIn');
+      deleteCookie('token');
+      deleteCookie('user');
     } catch (error) {
       console.error('Error store logout:', error);
+      throw error;
+    }
+  },
+
+  integrateWallet: async (walletId: string) => {
+    try {
+      const response = await integrateWallet(walletId);
+      return response;
+    } catch (error) {
+      console.error('Error store integrateWallet:', error);
       throw error;
     }
   },

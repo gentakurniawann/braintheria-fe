@@ -1,5 +1,5 @@
 import axios from '@/lib/axios';
-import { TResponseMe } from '@/types';
+import { TResponseMe, TWalletResponse } from '@/types';
 
 // export async function logout(): Promise<TResponseLogin> {
 //   try {
@@ -17,6 +17,16 @@ export async function getMe(): Promise<TResponseMe> {
     return response.data;
   } catch (error) {
     console.error('Error from getMe: ', error);
+    throw error;
+  }
+}
+
+export async function integrateWallet(walletId: string): Promise<TWalletResponse> {
+  try {
+    const response = await axios.patch('/auth/me/wallet', { walletId });
+    return response.data;
+  } catch (error) {
+    console.error('Error from integrateWallet: ', error);
     throw error;
   }
 }

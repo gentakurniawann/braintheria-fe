@@ -46,7 +46,7 @@ export async function createQuestion(data: IQuestionPayload): Promise<Response<I
   }
 }
 
-export async function getAnswerList(questionId: string): Promise<Response<IAnswer>> {
+export async function getAnswerList(questionId: string): Promise<IAnswer> {
   try {
     const response = await axios.get(`/answers/${questionId}`);
     return response.data;
