@@ -42,6 +42,11 @@ export default function Dashboard() {
     set({ limit });
   };
 
+  const handleChangeStatus = (value: 'All' | 'Open' | 'Verified' | 'Cancelled') => {
+    setStatus(value);
+    set({ page: 1 });
+  };
+
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-7 lg:col-start-2">
@@ -60,7 +65,7 @@ export default function Dashboard() {
             <Select
               defaultValue="All"
               onValueChange={(value) =>
-                setStatus(value as 'All' | 'Open' | 'Verified' | 'Cancelled')
+                handleChangeStatus(value as 'All' | 'Open' | 'Verified' | 'Cancelled')
               }
             >
               <SelectTrigger className="w-[180px] mb-4">
